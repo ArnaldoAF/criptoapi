@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" type="image/png" href="icon/currency/generic.png" />
     <title>CoinMarketCap</title>
 </head>
 
@@ -23,6 +24,9 @@
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-3 " id="coin">
 
         </div>
+        <div class=" container mb-4" id="loaderbutton">
+
+        </div>
     </div>
     <script type="text/javascript">
         //Api key
@@ -37,57 +41,32 @@
         </div>`;
         document.getElementById("coin").innerHTML = texto;
         var coinsTotal = 10;
+        var apiData = "";
 
-        //GET
-        fetch('https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=' + apikey.key)
-            .then((response) => {
-                if (!response.ok) throw new Error('Erro na requisição status ' + response.status)
-                return response.json();
-            })
-            .then((api) => {
-                console.log(api);
-                texto = "";
-                for (let i = 0; i < 10; i++) {
-                    //Show Api Info
-                    /*
-                    texto = texto + `
-                    
-                    <div class="media">
-                        <img src="icon/currency/${api.data[i].symbol}.png" 
-                                onerror="this.onerror=null;this.src='icon/currency/generic.png';"
-                                alt="coin" 
-                                class="align-self-center mr-3" 
-                                width="100" 
-                                height="100">
-                        <div class="media-body">
-                            <h5 class="mt-2">
-                                ${api.data[i].name}
-                            </h5>
-                            <p>${api.data[i].symbol}</p>
-                        </div>
-                    </div>
 
-                    `;
-                    */
-                    let oldDate = new Date(Date.parse(api.data[i].first_historical_data));
+        function reload() {
 
-                    texto = texto + `
+            for (let i = (coinsTotal - 10); i < coinsTotal; i++) {
+                //Show Api Info
+                let oldDate = new Date(Date.parse(apiData[i].first_historical_data));
+
+                texto = texto + `
                     <div class="col">
                         <div class="card mb-3 text-dark bg-info" style="max-width: 540px;">
                             <div class="row g-0">
-                                <div class="col-4 align-middle">
-                                    <img src="icon/currency/${api.data[i].symbol}.png" 
+                                <div class="col-4 d-flex align-items-center">
+                                    <img src="icon/currency/${apiData[i].symbol}.png" 
                                         onerror="this.onerror=null;this.src='icon/currency/generic.png';"
                                         alt="coin" 
                                         width:"100%"
-                                        class="align-middle img-fluid"
+                                        class="align-middle img-fluid ml-3"
                                         >
                                 </div>
                                 <div class="col-8">
                                 <div class="card-body">
-                                    <h5 class="card-title">${api.data[i].name}</h5>
-                                    <p class="card-text">${api.data[i].symbol}</p>
-                                    <p class="card-text"><small class="">First hitorical data : ${oldDate.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric'})}</small></p>
+                                    <h5 class="card-title">${apiData[i].name}</h5>
+                                    <p class="card-text">${apiData[i].symbol}</p>
+                                    <p class="card-text"><small class="">1st hitorical data: ${oldDate.toLocaleDateString("en-US", {day: 'numeric', month: 'short', year: 'numeric'})}</small></p>
                                 </div>
                                 </div>
                             </div>
@@ -96,8 +75,27 @@
 
                     `;
 
-                    document.getElementById("coin").innerHTML = texto;
-                }
+                document.getElementById("coin").innerHTML = texto;
+            }
+        }
+
+        function loadMore() {
+            coinsTotal += 10;
+            reload();
+        }
+        //GET
+        fetch('https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=' + apikey.key)
+            .then((response) => {
+                if (!response.ok) throw new Error('Erro na requisição status ' + response.status)
+                return response.json();
+            })
+            .then((api) => {
+                texto = "";
+                console.log(api);
+                apiData = api.data;
+                document.getElementById("loaderbutton").innerHTML = `
+                 <button class="btn btn-primary col" type="button" id="loadMore" onClick="loadMore()">Load 10 More Coins</button>`
+                reload();
             })
             .catch((error) => {
                 console.error(error.message);
