@@ -9,6 +9,16 @@
 </head>
 
 <body>
+    <div class=" bg-dark bg-gradient text-white text-center">
+        <div class="container-sm ">
+            <h1 class="display-4">Cripto from API</h1>
+            <h6>by: <a href="https://github.com/ArnaldoAF"> Arnaldo Assis Ferreira </a></h6>
+            <p>This page use the <mark>coinmarketcap API</mark> to get the list of criptcurrencies.</p>
+            <p><em>Icons by: <a href="https://github.com/spothq/cryptocurrency-icons"> cryptocurrency-icons </a> </em></p>
+
+        </div>
+    </div>
+
     <div class="container-sm">
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-3 " id="coin">
 
@@ -19,6 +29,14 @@
         let apikey = {
             key: '03235341-bc2b-46e5-ac98-b893a2d94e9c'
         }
+        var texto = `
+        <div class="container-sm text-center">
+            <div class="spinner-border text-info" role="status">
+                
+            </div>
+        </div>`;
+        document.getElementById("coin").innerHTML = texto;
+        var coinsTotal = 10;
 
         //GET
         fetch('https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?CMC_PRO_API_KEY=' + apikey.key)
@@ -28,7 +46,7 @@
             })
             .then((api) => {
                 console.log(api);
-                let texto = "";
+                texto = "";
                 for (let i = 0; i < 10; i++) {
                     //Show Api Info
                     /*
@@ -51,22 +69,25 @@
 
                     `;
                     */
+                    let oldDate = new Date(Date.parse(api.data[i].first_historical_data));
+
                     texto = texto + `
                     <div class="col">
                         <div class="card mb-3 text-dark bg-info" style="max-width: 540px;">
                             <div class="row g-0">
-                                <div class="col-4 bg-dark">
+                                <div class="col-4 align-middle">
                                     <img src="icon/currency/${api.data[i].symbol}.png" 
                                         onerror="this.onerror=null;this.src='icon/currency/generic.png';"
                                         alt="coin" 
                                         width:"100%"
+                                        class="align-middle img-fluid"
                                         >
                                 </div>
                                 <div class="col-8">
                                 <div class="card-body">
                                     <h5 class="card-title">${api.data[i].name}</h5>
                                     <p class="card-text">${api.data[i].symbol}</p>
-                                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                    <p class="card-text"><small class="">First hitorical data : ${oldDate.toLocaleDateString("en-US", {day: 'numeric', month: 'long', year: 'numeric'})}</small></p>
                                 </div>
                                 </div>
                             </div>
